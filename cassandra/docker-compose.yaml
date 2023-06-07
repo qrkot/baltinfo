@@ -1,0 +1,52 @@
+networks:
+
+  lan:
+    driver: ipvlan
+    driver_opts:
+      parent: "${LAN_IFACE}"
+    ipam:
+      driver: default
+      config:
+        - subnet: "${LAN_CIDR}"
+          gateway: "${LAN_GATEWAY}"
+          ip_range: "${IP_RANGE_CIDR}"
+
+services:
+
+  seed_node:
+    image: "cassandra:latest"
+    container_name: "seed_node"
+    healthcheck:
+      test: ["CMD", "nodetool", "info"]
+      interval: 1m
+    networks:
+      - lan
+
+  node_1:
+    image: "cassandra:latest"
+    container_name: "node_1"
+    healthcheck:
+      test: ["CMD", "nodetool", "info"]
+      interval: 1m
+    networks:
+      - lan
+    environment:
+      CASSANDRA_SEEDS: seed_node
+    depends_on:
+      seed_node:
+        condition: service_healthy
+
+  node_2:
+    image: "cassandra:latest"
+    container_name: "node_2"
+    healthcheck:
+      test: ["CMD", "nodetool", "info"]
+      interval: 1m
+    networks:
+      - lan
+    environment:
+      CASSANDRA_SEEDS: seed_node
+    depends_on:
+      node_1:
+        condition: service_healthy
+
