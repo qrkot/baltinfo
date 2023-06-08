@@ -16,6 +16,7 @@ services:
   seed_node:
     image: "cassandra:latest"
     container_name: "seed_node"
+    restart: always
     healthcheck:
       test: ["CMD", "nodetool", "info"]
       interval: 1m
@@ -25,6 +26,7 @@ services:
   node_1:
     image: "cassandra:latest"
     container_name: "node_1"
+    restart: always
     healthcheck:
       test: ["CMD", "nodetool", "info"]
       interval: 1m
@@ -39,6 +41,7 @@ services:
   node_2:
     image: "cassandra:latest"
     container_name: "node_2"
+    restart: always
     healthcheck:
       test: ["CMD", "nodetool", "info"]
       interval: 1m
