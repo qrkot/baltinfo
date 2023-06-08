@@ -1,0 +1,46 @@
+---
+
+- name: Set DIT and admin with reconfigure
+  ansible.builtin.debconf:
+    name: slapd
+    question: "{{ item.q }}"
+    value: "{{ item.a }}"
+    vtype: "{{ item.t }}"
+  loop:
+    - { q: 'slapd/password1', a: "{{ ldap_admin_password }}", t: 'password'}
+    - { q: 'slapd/password2', a: "{{ ldap_admin_password }}", t: 'password'}
+    - { q: 'slapd/purge_database', a: 'true', t: 'boolean'}
+    - { q: 'shared/organization', a: "{{ ldap_org_name }}", t: 'text'}
+    - { q: 'slapd/no_configuration', a: 'false', t: 'boolean'}
+    - { q: 'slapd/domain', a: "{{ ldap_org_domain }}", t: 'text'}
+    - { q: 'slapd/move_old_database', a: 'false', t: 'boolean'}
+
+- name: Install simple OpenLDAP 
+  ansible.builtin.apt:
+    state: present
+    install_recommends: false
+    name:
+      - slapd
+      - ldap-utils
+
+- name: Test connection
+  become: false
+  ansible.builtin.shell:
+    cmd: "ldapwhoami -x -D {{ ldap_admin_dn }} -w {{ ldap_admin_password }}"
+
+- name: Copy sample LDIF template
+  ansible.builtin.template:
+    src: sample_entries.j2
+    dest: ./sample.ldif
+
+- name: Apply sample LDIF
+  ansible.builtin.command:
+    cmd: "ldapadd -x -D {{ ldap_admin_dn }} -w {{ ldap_admin_password }} -f ./sample.ldif"
+
+- name: Change user passwords
+  ansible.builtin.command:
+    cmd: "ldappasswd -x -D {{ ldap_admin_dn }} -w {{ ldap_admin_password }} -s {{ item.p }} cn={{ item.u }},ou=Users,{{ ldap_base_dn }}"
+  loop:
+    - { u: "userone", p: "111" }
+    - { u: "usertwo", p: "222" }
+

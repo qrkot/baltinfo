@@ -1,0 +1,38 @@
+# Users unit
+dn: ou=Users,{{ ldap_base_dn }}
+ou: users
+objectClass: organizationalUnit
+
+# Groups unit
+dn: ou=Groups,{{ ldap_base_dn }}
+ou: groups
+objectClass: organizationalUnit
+
+
+# Grop One
+dn: cn=groupone,ou=Groups,{{ ldap_base_dn }}
+cn: groupone
+member:
+objectClass: groupOfNames
+
+# Group Two
+dn: cn=grouptwo,ou=Groups,{{ ldap_base_dn }}
+cn: grouptwo
+member:
+objectClass: groupOfNames
+
+
+# User One
+dn: cn=userone,ou=Users,{{ ldap_base_dn }}
+cn: userone
+sn: One
+userPassword: {CRYPT}x
+objectClass: person
+
+# User Two
+dn: cn=usertwo,ou=Users,{{ ldap_base_dn }}
+cn: usertwo
+sn: Two
+userPassword: {CRYPT}x
+objectClass: person
+

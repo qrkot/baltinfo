@@ -1,0 +1,7 @@
+---
+
+ldap_admin_password: "admin"
+ldap_org_name: "Test Organization Ltd"
+ldap_org_domain: "test.org"
+ldap_base_dn: "dc={{ ldap_org_domain.split('.')[0] }},dc={{ ldap_org_domain.split('.')[1] }}"
+ldap_admin_dn: "cn=admin,{{ ldap_base_dn }}"
